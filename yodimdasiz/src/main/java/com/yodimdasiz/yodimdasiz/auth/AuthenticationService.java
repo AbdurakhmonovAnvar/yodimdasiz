@@ -10,7 +10,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-
+import java.util.HashMap;
+import java.util.Map;
 
 
 @Service
@@ -34,7 +35,9 @@ public class AuthenticationService {
                 .password(passwordEncoder.encode(request.getPassword()))
                 .build();
         repository.save(user);
-        var jwtToken = jwtService.generateToken(user);
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("id", user.getId());
+        var jwtToken = jwtService.generateToken(claims,user);
         return AuthenticationResponse.builder()
                 .token(jwtToken)
                 .build();
@@ -43,7 +46,7 @@ public class AuthenticationService {
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
         var user = repository.findByEmail(request.getEmail()).orElseThrow();
-        var jwtToken = jwtService.generateToken(user);
+        var jwtToken = jwtService.generateToken(user, user.getId());
         return AuthenticationResponse.builder().token(jwtToken).build();
 
     }
