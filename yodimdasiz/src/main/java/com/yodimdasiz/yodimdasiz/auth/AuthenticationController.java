@@ -25,4 +25,9 @@ public class AuthenticationController {
         return ResponseEntity.ok(authService.authenticate(request));
     }
 
+    @PostMapping("/phone")
+    public ResponseEntity<AuthenticationResponse> authPhone(@RequestBody AuthenticationRequest request){
+        return ResponseEntity.ok(authService.authPhone(request));
+    }
+
 }

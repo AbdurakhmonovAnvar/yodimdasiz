@@ -23,11 +23,6 @@ public class AuthenticationService {
     private final AuthenticationManager authenticationManager;
 
     public AuthenticationResponse register(RegisterRequest request){
-//        var user = new Users();
-//        user.setName(request.getName());
-//        user.setEmail(request.getEmail());
-//        user.setPassword(passwordEncoder.encode(request.getPassword()));
-//        user.setRole(Role.USER);
         var user  = Users.builder()
                 .username(request.getUsername())
                 .email(request.getEmail())
@@ -46,6 +41,14 @@ public class AuthenticationService {
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
         var user = repository.findByEmail(request.getEmail()).orElseThrow();
+        var jwtToken = jwtService.generateToken(user, user.getId());
+        return AuthenticationResponse.builder().token(jwtToken).build();
+
+    }
+
+    public AuthenticationResponse authPhone(AuthenticationRequest request) {
+        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getPhone(), request.getPassword()));
+        var user = repository.findByPhone(request.getPhone()).orElseThrow();
         var jwtToken = jwtService.generateToken(user, user.getId());
         return AuthenticationResponse.builder().token(jwtToken).build();
 
