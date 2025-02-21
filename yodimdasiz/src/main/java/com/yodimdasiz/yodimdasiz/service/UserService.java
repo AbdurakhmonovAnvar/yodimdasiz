@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -28,4 +29,42 @@ public class UserService {
         return repository.save(user);
     }
 
+    public Users createUser(Users user) {
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        return repository.save(user);
+    }
+
+    public Users getUserById(Integer id) {
+        return repository.findById(id).orElseThrow(() -> new BadRequest("User not found"));
+    }
+
+    public Users updateUser(Integer id, Users updatedUser) {
+        Users user = repository.findById(id).orElseThrow(() -> new BadRequest("User not found"));
+
+        if (updatedUser.getPhone() != null) {
+            user.setPhone(updatedUser.getPhone());
+        }
+        if (updatedUser.getEmail() != null) {
+            user.setEmail(updatedUser.getEmail());
+        }
+        if (updatedUser.getPassword() != null) {
+            user.setPassword(passwordEncoder.encode(updatedUser.getPassword()));
+        }
+
+        return repository.save(user);
+    }
+
+    public void deleteUser(Integer id, String email, String password) {
+        Users user = repository.findById(id).orElseThrow(() -> new BadRequest("User not found"));
+
+        if (!user.getEmail().equals(email) || !passwordEncoder.matches(password, user.getPassword())) {
+            throw new BadRequest("Invalid credentials");
+        }
+
+        repository.delete(user);
+    }
+
+    public List<Users> getAllUsers() {
+        return repository.findAll();
+    }
 }
