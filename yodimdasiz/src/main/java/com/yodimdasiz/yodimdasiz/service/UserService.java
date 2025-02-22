@@ -61,14 +61,13 @@ public class UserService {
         return repository.save(user);
     }
 
-    public void deleteUser(Integer id, String email, String password) {
-        Users user = repository.findById(id).orElseThrow(() -> new BadRequest("User not found"));
-
-        if (!user.getEmail().equals(email) || !passwordEncoder.matches(password, user.getPassword())) {
-            throw new BadRequest("Invalid credentials");
+    public void deleteUser(Integer id) {
+        Optional<Users> optional = repository.findById(id);
+        if (optional.isEmpty()){
+            throw new BadRequest("User not found");
         }
-
-        user.isEnabled();
+        var  user = optional.get();
+        repository.delete(user);
     }
 
     public List<Users> getAllUsers() {
