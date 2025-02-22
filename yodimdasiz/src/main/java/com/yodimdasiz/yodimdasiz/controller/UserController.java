@@ -83,11 +83,11 @@ public class UserController {
         return ResponseEntity.ok(updatedPassword);
     }
 
-    @PutMapping("/delete")
-    public ResponseEntity<String> deleteUser(@RequestHeader("Authorization") String token, @RequestBody Users user) {
+    @DeleteMapping("/delete")
+    public ResponseEntity<String> deleteUser(@RequestHeader("Authorization") String token) {
         String jwtToken = token.substring(7);
         Integer id = jwtUtil.extractUserId(jwtToken);
-        service.deleteUser(id, user.getEmail(), user.getPassword());
+        service.deleteUser(id);
         return ResponseEntity.ok("User successfully deleted");
     }
 
