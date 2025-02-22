@@ -49,7 +49,7 @@ public class UserController {
         return ResponseEntity.ok(updatedUser);
     }
 
-    @DeleteMapping("/delete")
+    @PutMapping("/delete")
     public ResponseEntity<String> deleteUser(@RequestHeader("Authorization") String token, @RequestBody Users user) {
         String jwtToken = token.substring(7);
         Integer id = jwtUtil.extractUserId(jwtToken);

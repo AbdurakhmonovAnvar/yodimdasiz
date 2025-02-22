@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import javax.swing.text.html.Option;
 import java.util.List;
 import java.util.Optional;
 
@@ -35,7 +36,12 @@ public class UserService {
     }
 
     public Users getUserById(Integer id) {
-        return repository.findById(id).orElseThrow(() -> new BadRequest("User not found"));
+        Optional<Users> optional = repository.findById(id);
+        if (optional.isEmpty()){
+            var strId = String.valueOf(id);
+            throw new BadRequest("User"+strId+"not found");
+        }
+        return optional.get();
     }
 
     public Users updateUser(Integer id, Users updatedUser) {
@@ -61,7 +67,7 @@ public class UserService {
             throw new BadRequest("Invalid credentials");
         }
 
-        repository.delete(user);
+        user.isEnabled();
     }
 
     public List<Users> getAllUsers() {
