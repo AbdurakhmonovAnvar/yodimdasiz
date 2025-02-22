@@ -45,6 +45,14 @@ public class UserController {
         return ResponseEntity.ok(updatedUser);
     }
 
+    @PutMapping("/password")
+    public ResponseEntity<?> updatePassword(@RequestHeader("Authorization") String token,@RequestBody Users user){
+        String jwtToken = token.substring(7);
+        Integer id = jwtUtil.extractUserId(jwtToken);
+        Users updatedPassword = service.updatePassword(id, user);
+        return ResponseEntity.ok(updatedPassword);
+    }
+
     @PutMapping("/delete")
     public ResponseEntity<String> deleteUser(@RequestHeader("Authorization") String token, @RequestBody Users user) {
         String jwtToken = token.substring(7);

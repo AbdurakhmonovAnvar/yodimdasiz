@@ -3,6 +3,7 @@ package com.yodimdasiz.yodimdasiz.service;
 import com.yodimdasiz.yodimdasiz.exception.BadRequest;
 import com.yodimdasiz.yodimdasiz.model.Users;
 import com.yodimdasiz.yodimdasiz.repository.UserRepository;
+import org.apache.catalina.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -73,4 +74,11 @@ public class UserService {
     public List<Users> getAllUsers() {
         return repository.findAll();
     }
+
+    public Users updatePassword(Integer id, Users passwordUser){
+        Users user = repository.findById(id).orElseThrow(() -> new BadRequest("User not found"));
+        user.setPassword(passwordEncoder.encode(passwordUser.getPassword()));
+        return repository.save(user);
+    }
+
 }
