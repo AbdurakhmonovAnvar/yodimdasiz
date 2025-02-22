@@ -7,13 +7,25 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 
 @RestController
 @RequestMapping("/api/v1/user")
 @RequiredArgsConstructor
 public class UserController {
+
+    private static final String UPLOAD_USER_DIR = "uploads/";
 
     @Autowired
     private JwtService jwtUtil;
@@ -65,6 +77,32 @@ public class UserController {
     public ResponseEntity<List<Users>> getAllUsers() {
         List<Users> users = service.getAllUsers();
         return ResponseEntity.ok(users);
+    }
+
+    @PostMapping("/upload")
+    public ResponseEntity uploadImage(@RequestParam("file")MultipartFile file){
+        try {
+            LocalDate today = LocalDate.now();
+            String year = String.valueOf(today.getYear());
+            String month = String.format("%02d",today.getMonthValue());
+            String day =  String.format("%02d",today.getDayOfMonth());
+
+            String userFolderPath = UPLOAD_USER_DIR+ year+"/"+month+"/"+day+"users";
+            File userFolder = new File(userFolderPath);
+            if (!userFolder.exists()) userFolder.mkdir();
+
+            String fileName = UUID.randomUUID()+"_"+file.getOriginalFilename();
+            Path filePath = Paths.get(userFolderPath+fileName);
+
+            Files.write(filePath,file.getBytes());
+
+            String fileUrl =  "/uploads/" + year + "/" + month + "/" + day + "/users/" + fileName;
+
+            return ResponseEntity.ok("File uploaded successfully: " + fileUrl);
+        }
+        catch (IOException e) {
+            return ResponseEntity.ok("File upload failed: " + e.getMessage());
+        }
     }
 
 
