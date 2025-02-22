@@ -9,15 +9,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
+
 import java.util.List;
-import java.util.UUID;
 
 
 @RestController
@@ -56,20 +49,7 @@ public class UserController {
         Users updatedUser = service.updateUser(id, user);
         return ResponseEntity.ok(updatedUser);
     }
-    @PutMapping("/username")
-    public ResponseEntity<Users> updateName(@RequestHeader("Authorization") String token, @RequestBody Users user) {
-        String jwtToken = token.substring(7);
-        Integer id = jwtUtil.extractUserId(jwtToken);
-        Users updateName = service.updateName(id, user);
-        return ResponseEntity.ok(updateName);
-    }
-    @PutMapping("/email")
-    public ResponseEntity<Users> updateEmail(@RequestHeader("Authorization") String token, @RequestBody Users user) {
-        String jwtToken = token.substring(7);
-        Integer id = jwtUtil.extractUserId(jwtToken);
-        Users updateEmail = service.updateEmail(id, user);
-        return ResponseEntity.ok(updateEmail);
-    }
+
     @PutMapping("/role")
     public ResponseEntity<Users> updateRole(@RequestHeader("Authorization") String token, @RequestBody Users user) {
         String jwtToken = token.substring(7);
@@ -110,29 +90,11 @@ public class UserController {
     }
 
     @PostMapping("/upload")
-    public ResponseEntity uploadImage(@RequestParam("file")MultipartFile file){
-        try {
-            LocalDate today = LocalDate.now();
-            String year = String.valueOf(today.getYear());
-            String month = String.format("%02d",today.getMonthValue());
-            String day =  String.format("%02d",today.getDayOfMonth());
-
-            String userFolderPath = UPLOAD_USER_DIR+ year+"/"+month+"/"+day+"users";
-            File userFolder = new File(userFolderPath);
-            if (!userFolder.exists()) userFolder.mkdir();
-
-            String fileName = UUID.randomUUID()+"_"+file.getOriginalFilename();
-            Path filePath = Paths.get(userFolderPath+fileName);
-
-            Files.write(filePath,file.getBytes());
-
-            String fileUrl =  "/uploads/" + year + "/" + month + "/" + day + "/users/" + fileName;
-
-            return ResponseEntity.ok("File uploaded successfully: " + fileUrl);
-        }
-        catch (IOException e) {
-            return ResponseEntity.ok("File upload failed: " + e.getMessage());
-        }
+    public ResponseEntity<?> uploadImage(@RequestHeader("Authorization") String token,@RequestParam("file")MultipartFile file){
+        String jwtToken = token.substring(7);
+        Integer id = jwtUtil.extractUserId(jwtToken);
+        String uploadImage = service.uploadImage(id,UPLOAD_USER_DIR,file);
+        return ResponseEntity.ok().body(uploadImage);
     }
 
 

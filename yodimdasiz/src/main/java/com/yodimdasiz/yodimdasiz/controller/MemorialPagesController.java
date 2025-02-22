@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/memorial-pages")
+@RequestMapping("/api/v1/memorep")
 @RequiredArgsConstructor
 public class MemorialPagesController {
     private final MemorialPagesService memorialPagesService;

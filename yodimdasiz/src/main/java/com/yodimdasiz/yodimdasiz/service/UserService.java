@@ -5,12 +5,21 @@ import com.yodimdasiz.yodimdasiz.model.Users;
 import com.yodimdasiz.yodimdasiz.repository.UserRepository;
 import org.apache.catalina.User;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.swing.text.html.Option;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class UserService {
@@ -75,20 +84,38 @@ public class UserService {
         user.setPassword(passwordEncoder.encode(passwordUser.getPassword()));
         return repository.save(user);
     }
-    public Users updateName(Integer id, Users nameUser){
-        Users user = repository.findById(id).orElseThrow(() -> new BadRequest("User not found"));
-        user.setUsername(passwordEncoder.encode(nameUser.getUsername()));
-        return repository.save(user);
-    }
-    public Users updateEmail(Integer id, Users emailUser){
-        Users user = repository.findById(id).orElseThrow(() -> new BadRequest("User not found"));
-        user.setEmail(passwordEncoder.encode(emailUser.getEmail()));
-        return repository.save(user);
-    }
+
+
     public Users updateRole(Integer id, Users roleUser){
         Users user = repository.findById(id).orElseThrow(() -> new BadRequest("User not found"));
         user.setRole(roleUser.getRole());
         return repository.save(user);
+    }
+
+    public String uploadImage(Integer id, String UPLOAD_USER_DIR, MultipartFile file){
+        try {
+            LocalDate today = LocalDate.now();
+            String year = String.valueOf(today.getYear());
+            String month = String.format("%02d",today.getMonthValue());
+            String day =  String.format("%02d",today.getDayOfMonth());
+
+            String userFolderPath = UPLOAD_USER_DIR+ year+"/"+month+"/"+day+"users";
+            File userFolder = new File(userFolderPath);
+            if (!userFolder.exists()) userFolder.mkdir();
+
+            String fileName = UUID.randomUUID()+"_"+file.getOriginalFilename();
+            Path filePath = Paths.get(userFolderPath+fileName);
+
+            Files.write(filePath,file.getBytes());
+
+            String fileUrl =  "/uploads/" + year + "/" + month + "/" + day + "/users/" + fileName;
+
+            return "File uploaded successfully: " + fileUrl;
+        }
+        catch (IOException e) {
+            return "File upload failed: " + e.getMessage();
+        }
+
     }
 
 

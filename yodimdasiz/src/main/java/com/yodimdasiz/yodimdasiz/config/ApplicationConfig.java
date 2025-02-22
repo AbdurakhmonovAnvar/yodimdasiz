@@ -30,9 +30,6 @@ public class ApplicationConfig {
                 .or(() -> userRepository.findByPhone(identifier))
                 .map(this::convertToUserDetails)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
-//        return email -> userRepository.findByEmail(email)
-//                .map(this::convertToUserDetails) // User -> UserDetails
-//                .orElseThrow(()-> new UsernameNotFoundException("User not found"));
     }
 
     private UserDetails convertToUserDetails(Users user) {
