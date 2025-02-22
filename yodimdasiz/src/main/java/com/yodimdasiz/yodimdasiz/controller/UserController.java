@@ -33,14 +33,14 @@ public class UserController {
     @Autowired
     private UserService service;
 
-    @PutMapping("/phone")
-    public ResponseEntity<?> updateUserPhone(@RequestHeader("Authorization") String token, @RequestBody Users user){
-        String jwtToken = token.substring(7);
-        System.out.println(jwtToken);
-        Integer id = jwtUtil.extractUserId(jwtToken);
-        Users result = service.updateUserPhone(id,user);
-        return ResponseEntity.ok(result);
-    }
+//    @PutMapping("/phone")
+//    public ResponseEntity<?> updateUserPhone(@RequestHeader("Authorization") String token, @RequestBody Users user){
+//        String jwtToken = token.substring(7);
+//        System.out.println(jwtToken);
+//        Integer id = jwtUtil.extractUserId(jwtToken);
+//        Users result = service.updateUserPhone(id,user);
+//        return ResponseEntity.ok(result);
+//    }
 
 
     @GetMapping("/{id}")
@@ -56,6 +56,36 @@ public class UserController {
         Users updatedUser = service.updateUser(id, user);
         return ResponseEntity.ok(updatedUser);
     }
+    @PutMapping("/username")
+    public ResponseEntity<Users> updateName(@RequestHeader("Authorization") String token, @RequestBody Users user) {
+        String jwtToken = token.substring(7);
+        Integer id = jwtUtil.extractUserId(jwtToken);
+        Users updateName = service.updateName(id, user);
+        return ResponseEntity.ok(updateName);
+    }
+    @PutMapping("/emails")
+    public ResponseEntity<Users> updateEmail(@RequestHeader("Authorization") String token, @RequestBody Users user) {
+        String jwtToken = token.substring(7);
+        Integer id = jwtUtil.extractUserId(jwtToken);
+        Users updateEmail = service.updateEmail(id, user);
+        return ResponseEntity.ok(updateEmail);
+    }
+    @PutMapping("/role")
+    public ResponseEntity<Users> updateRole(@RequestHeader("Authorization") String token, @RequestBody Users user) {
+        String jwtToken = token.substring(7);
+        Integer id = jwtUtil.extractUserId(jwtToken);
+        Users updateRole = service.updateRole(id, user);
+        return ResponseEntity.ok(updateRole);
+    }
+    @PutMapping("/phone")
+    public ResponseEntity<Users> updatePhone(@RequestHeader("Authorization") String token, @RequestBody Users user) {
+        String jwtToken = token.substring(7);
+        Integer id = jwtUtil.extractUserId(jwtToken);
+        Users updatedPhone = service.updateUserPhone(id, user);
+        return ResponseEntity.ok(updatedPhone);
+    }
+
+
 
     @PutMapping("/password")
     public ResponseEntity<?> updatePassword(@RequestHeader("Authorization") String token,@RequestBody Users user){
