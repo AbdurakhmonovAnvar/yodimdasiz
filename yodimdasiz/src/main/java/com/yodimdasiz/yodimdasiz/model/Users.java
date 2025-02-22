@@ -25,12 +25,16 @@ public class Users implements UserDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    @Column(unique = true, nullable = false)
     private String username;
 
+    @Column(unique = true, nullable = false)
     private String email;
 
+    @Column(unique = true)
     private String phone;
 
+    @Column(nullable = false)
     private String password;
 
     private String photoUrl;
