@@ -29,11 +29,7 @@ public class UserController {
         Users result = service.updateUserPhone(id,user);
         return ResponseEntity.ok(result);
     }
-    @PostMapping("/create")
-    public ResponseEntity<Users> createUser(@RequestBody Users user) {
-        Users newUser = service.createUser(user);
-        return ResponseEntity.ok(newUser);
-    }
+
 
     @GetMapping("/{id}")
     public ResponseEntity<Users> getUserById(@PathVariable Integer id) {
