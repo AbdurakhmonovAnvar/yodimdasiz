@@ -22,20 +22,26 @@ public class ApplicationConfig {
 
     private final  UserRepository userRepository;
 
+
+
     @Bean
     public UserDetailsService userDetailsService(){
-        return email -> userRepository.findByEmail(email)
-                .map(this::convertToUserDetails) // User -> UserDetails
-                .orElseThrow(()-> new UsernameNotFoundException("User not found"));
+        return identifier -> userRepository.findByEmail(identifier)
+                .or(() -> userRepository.findByPhone(identifier))
+                .map(this::convertToUserDetails)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+//        return email -> userRepository.findByEmail(email)
+//                .map(this::convertToUserDetails) // User -> UserDetails
+//                .orElseThrow(()-> new UsernameNotFoundException("User not found"));
     }
 
     private UserDetails convertToUserDetails(Users user) {
         return org.springframework.security.core.userdetails.User.builder()
                 .username(user.getEmail())
-                .password(user.getPassword()) // Password shifrlangan bo‘lishi kerak
-                .roles(user.getRole().name()) // User rollari qo‘shiladi
-                .disabled(!user.isEnabled()) // Agar user deaktiv bo‘lsa, login bo‘la olmaydi
-                .accountLocked(!user.isAccountNonLocked()) // Bloklangan userlar login bo‘la olmaydi
+                .password(user.getPassword())
+                .roles(user.getRole().name())
+                .disabled(!user.isEnabled())
+                .accountLocked(!user.isAccountNonLocked())
                 .build();
     }
     @Bean

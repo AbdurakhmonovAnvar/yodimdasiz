@@ -2,11 +2,13 @@ package com.yodimdasiz.yodimdasiz.auth;
 
 import com.yodimdasiz.yodimdasiz.config.JwtService;
 import com.yodimdasiz.yodimdasiz.enums.Role;
+import com.yodimdasiz.yodimdasiz.exception.BadRequest;
 import com.yodimdasiz.yodimdasiz.model.Users;
 import com.yodimdasiz.yodimdasiz.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -23,11 +25,6 @@ public class AuthenticationService {
     private final AuthenticationManager authenticationManager;
 
     public AuthenticationResponse register(RegisterRequest request){
-//        var user = new Users();
-//        user.setName(request.getName());
-//        user.setEmail(request.getEmail());
-//        user.setPassword(passwordEncoder.encode(request.getPassword()));
-//        user.setRole(Role.USER);
         var user  = Users.builder()
                 .username(request.getUsername())
                 .email(request.getEmail())
@@ -44,11 +41,37 @@ public class AuthenticationService {
     }
 
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
-        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
-        var user = repository.findByEmail(request.getEmail()).orElseThrow();
+
+        if ((request.getEmail() == null || request.getEmail().isBlank()) &&
+                (request.getPhone() == null || request.getPhone().isBlank())){
+                throw new BadRequest("Phone number or email is mandatory");
+        }
+
+        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
+                request.getEmail() != null ? request.getEmail() : request.getPhone(), request.getPassword()
+        ));
+
+        var user = repository.findByEmail(request.getEmail())
+                        .or(() -> repository.findByPhone(request.getPhone()))
+                                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
+
         var jwtToken = jwtService.generateToken(user, user.getId());
+
+
+//        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
+//        var user = repository.findByEmail(request.getEmail()).orElseThrow();
+//        var jwtToken = jwtService.generateToken(user, user.getId());
         return AuthenticationResponse.builder().token(jwtToken).build();
 
     }
+
+//    public AuthenticationResponse authPhone(AuthenticationRequest request) {
+//        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getPhone(), request.getPassword()));
+//        var user = repository.findByPhone(request.getPhone()).orElseThrow();
+//        var jwtToken = jwtService.generateToken(user, user.getId());
+//        return AuthenticationResponse.builder().token(jwtToken).build();
+//
+//    }
 
 }
