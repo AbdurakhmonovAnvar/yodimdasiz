@@ -31,10 +31,6 @@ public class UserService {
         return repository.save(user);
     }
 
-    public Users createUser(Users user) {
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        return repository.save(user);
-    }
 
     public Users getUserById(Integer id) {
         Optional<Users> optional = repository.findById(id);
@@ -80,5 +76,21 @@ public class UserService {
         user.setPassword(passwordEncoder.encode(passwordUser.getPassword()));
         return repository.save(user);
     }
+    public Users updateName(Integer id, Users nameUser){
+        Users user = repository.findById(id).orElseThrow(() -> new BadRequest("User not found"));
+        user.setUsername(passwordEncoder.encode(nameUser.getUsername()));
+        return repository.save(user);
+    }
+    public Users updateEmail(Integer id, Users emailUser){
+        Users user = repository.findById(id).orElseThrow(() -> new BadRequest("User not found"));
+        user.setEmail(passwordEncoder.encode(emailUser.getEmail()));
+        return repository.save(user);
+    }
+    public Users updateRole(Integer id, Users roleUser){
+        Users user = repository.findById(id).orElseThrow(() -> new BadRequest("User not found"));
+        user.setRole(roleUser.getRole());
+        return repository.save(user);
+    }
+
 
 }
