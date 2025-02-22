@@ -63,7 +63,7 @@ public class UserController {
         Users updateName = service.updateName(id, user);
         return ResponseEntity.ok(updateName);
     }
-    @PutMapping("/emails")
+    @PutMapping("/email")
     public ResponseEntity<Users> updateEmail(@RequestHeader("Authorization") String token, @RequestBody Users user) {
         String jwtToken = token.substring(7);
         Integer id = jwtUtil.extractUserId(jwtToken);
