@@ -8,8 +8,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.core.io.Resource;
 
 
+import java.io.IOException;
 import java.util.List;
 
 
@@ -18,7 +20,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserController {
 
-    private static final String UPLOAD_USER_DIR = "uploads/";
+//    private static final String UPLOAD_USER_DIR = "src/main/resources/static/uploads/";
 
     @Autowired
     private JwtService jwtUtil;
@@ -26,18 +28,12 @@ public class UserController {
     @Autowired
     private UserService service;
 
-//    @PutMapping("/phone")
-//    public ResponseEntity<?> updateUserPhone(@RequestHeader("Authorization") String token, @RequestBody Users user){
-//        String jwtToken = token.substring(7);
-//        System.out.println(jwtToken);
-//        Integer id = jwtUtil.extractUserId(jwtToken);
-//        Users result = service.updateUserPhone(id,user);
-//        return ResponseEntity.ok(result);
-//    }
 
 
-    @GetMapping("/{id}")
-    public ResponseEntity<Users> getUserById(@PathVariable Integer id) {
+    @GetMapping
+    public ResponseEntity<Users> getUserById(@RequestHeader("Authorization") String token) {
+        String jwtToken = token.substring(7);
+        Integer id = jwtUtil.extractUserId(jwtToken);
         Users user = service.getUserById(id);
         return ResponseEntity.ok(user);
     }
@@ -89,13 +85,33 @@ public class UserController {
         return ResponseEntity.ok(users);
     }
 
-    @PostMapping("/upload")
-    public ResponseEntity<?> uploadImage(@RequestHeader("Authorization") String token,@RequestParam("file")MultipartFile file){
+    @PutMapping("/uploadPhoto")
+    public ResponseEntity<?> uploadImage(@RequestHeader("Authorization") String token,@RequestParam("image")MultipartFile file){
         String jwtToken = token.substring(7);
         Integer id = jwtUtil.extractUserId(jwtToken);
-        String uploadImage = service.uploadImage(id,UPLOAD_USER_DIR,file);
+        String uploadImage = service.uploadImage(id,file);
         return ResponseEntity.ok().body(uploadImage);
     }
+
+    @GetMapping("/photo")
+    public ResponseEntity<Resource> getUserPhoto(@RequestHeader("Authorization") String token) throws IOException {
+        String jwtToken = token.substring(7);
+        Integer id = jwtUtil.extractUserId(jwtToken);
+        return service.getUserPhoto(id,token);
+    }
+
+
+
+    @PutMapping
+    public ResponseEntity<?> updateName(@RequestHeader("Authorization") String token, @RequestBody Users users){
+        String jwtToken = token.substring(7);
+        Integer id = jwtUtil.extractUserId(jwtToken);
+        Users reslut = service.updateName(id,users);
+        return ResponseEntity.ok().body(reslut);
+
+    }
+
+
 
 
 

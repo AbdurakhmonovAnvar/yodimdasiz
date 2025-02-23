@@ -3,6 +3,7 @@ package com.yodimdasiz.yodimdasiz.model;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
+import org.w3c.dom.Text;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -20,14 +21,14 @@ public class MemorialPages {
     private Integer id;
 
     @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private Users user;
+    @JoinColumn(name = "user_creator_id", nullable = false)
+    private Users userCreatorId;
 
     private String fullName;
 
-    private LocalDate birthDate;
+    private String birthDate;
 
-    private LocalDate deathDate;
+    private String deathDate;
 
     @Column(columnDefinition = "TEXT")
     private String biography;

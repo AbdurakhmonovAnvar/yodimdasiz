@@ -1,25 +1,25 @@
 package com.yodimdasiz.yodimdasiz.service;
 
+import com.yodimdasiz.yodimdasiz.config.JwtService;
 import com.yodimdasiz.yodimdasiz.exception.BadRequest;
 import com.yodimdasiz.yodimdasiz.model.Users;
 import com.yodimdasiz.yodimdasiz.repository.UserRepository;
-import org.apache.catalina.User;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.UrlResource;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 
-import javax.swing.text.html.Option;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.LocalDate;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 public class UserService {
@@ -30,9 +30,9 @@ public class UserService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    public Users updateUserPhone(Integer id, Users users){
+    public Users updateUserPhone(Integer id, Users users) {
         Optional<Users> optional = repository.findById(id);
-        if (optional.isEmpty()){
+        if (optional.isEmpty()) {
             throw new BadRequest("User not found");
         }
         Users user = optional.get();
@@ -43,9 +43,9 @@ public class UserService {
 
     public Users getUserById(Integer id) {
         Optional<Users> optional = repository.findById(id);
-        if (optional.isEmpty()){
+        if (optional.isEmpty()) {
             var strId = String.valueOf(id);
-            throw new BadRequest("User"+strId+"not found");
+            throw new BadRequest("User" + strId + "not found");
         }
         return optional.get();
     }
@@ -68,10 +68,10 @@ public class UserService {
 
     public void deleteUser(Integer id) {
         Optional<Users> optional = repository.findById(id);
-        if (optional.isEmpty()){
+        if (optional.isEmpty()) {
             throw new BadRequest("User not found");
         }
-        var  user = optional.get();
+        var user = optional.get();
         repository.delete(user);
     }
 
@@ -79,42 +79,95 @@ public class UserService {
         return repository.findAll();
     }
 
-    public Users updatePassword(Integer id, Users passwordUser){
+    public Users updatePassword(Integer id, Users passwordUser) {
         Users user = repository.findById(id).orElseThrow(() -> new BadRequest("User not found"));
         user.setPassword(passwordEncoder.encode(passwordUser.getPassword()));
         return repository.save(user);
     }
 
 
-    public Users updateRole(Integer id, Users roleUser){
+    public Users updateRole(Integer id, Users roleUser) {
         Users user = repository.findById(id).orElseThrow(() -> new BadRequest("User not found"));
         user.setRole(roleUser.getRole());
         return repository.save(user);
     }
 
-    public String uploadImage(Integer id, String UPLOAD_USER_DIR, MultipartFile file){
+    public String uploadImage(Integer id, MultipartFile file) {
+        String YMD = getYMD();
+        String token = UUID.randomUUID().toString();
+        Optional<Users> optional = repository.findById(id);
+
+        if (optional.isEmpty()) {
+            throw new BadRequest("User not found");
+        }
+
+        var user = optional.get();
+
+        // Spring Boot resource papkasiga faylni saqlash yo‘li
+        String uploadDir = new File("yodimdasiz/src/main/resources/static/uploads/users").getAbsolutePath();
+        File folder = new File(uploadDir + File.separator + YMD);
+        if (!folder.exists() && !folder.mkdirs()) {
+            throw new RuntimeException("Failed to create directory: " + folder.getAbsolutePath());
+        }
+
+        String filePath = folder.getAbsolutePath() + File.separator + token + ".png";
+        File imageFile = new File(filePath);
+
+        // Fayl mavjudligini tekshirish
+        if (file == null || file.isEmpty()) {
+            throw new BadRequest("File is empty");
+        }
+
         try {
-            LocalDate today = LocalDate.now();
-            String year = String.valueOf(today.getYear());
-            String month = String.format("%02d",today.getMonthValue());
-            String day =  String.format("%02d",today.getDayOfMonth());
-
-            String userFolderPath = UPLOAD_USER_DIR+ year+"/"+month+"/"+day+"users";
-            File userFolder = new File(userFolderPath);
-            if (!userFolder.exists()) userFolder.mkdir();
-
-            String fileName = UUID.randomUUID()+"_"+file.getOriginalFilename();
-            Path filePath = Paths.get(userFolderPath+fileName);
-
-            Files.write(filePath,file.getBytes());
-
-            String fileUrl =  "/uploads/" + year + "/" + month + "/" + day + "/users/" + fileName;
-
-            return "File uploaded successfully: " + fileUrl;
+            file.transferTo(imageFile); // Faylni saqlash
+            user.setPhotoUrl("/uploads/users/" + YMD + "/" + token + ".png"); // Frontend uchun URL
+            repository.save(user);
+            return "File uploaded successfully: " + user.getPhotoUrl();
+        } catch (IOException e) {
+            throw new RuntimeException("File upload failed: " + e.getMessage());
         }
-        catch (IOException e) {
-            return "File upload failed: " + e.getMessage();
+    }
+
+
+    public String getYMD() {
+        int year = Calendar.getInstance().get(Calendar.YEAR);
+        int month = Calendar.getInstance().get(Calendar.MONTH);
+        int day = Calendar.getInstance().get(Calendar.DAY_OF_MONTH);
+        return String.format("%s/%s/%s", year, month + 1, day);
+    }
+    private final String uploadDir = "yodimdasiz/src/main/resources/static/uploads/users/";
+
+    public ResponseEntity<Resource> getUserPhoto(Integer id, String token) throws IOException {
+        Optional<Users> optional = repository.findById(id);
+
+        if (optional.isEmpty() || optional.get().getPhotoUrl() == null) {
+            return ResponseEntity.notFound().build();
         }
+
+        String photoUrl = optional.get().getPhotoUrl();
+        Path filePath = Paths.get(uploadDir).resolve(photoUrl.replace("/uploads/users/", "")).normalize();
+        Resource resource = new UrlResource(filePath.toUri());
+
+        if (!resource.exists()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        String contentType = Files.probeContentType(filePath);
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(contentType))
+                .body(resource);
+    }
+
+
+    public Users updateName(Integer id, Users users){
+        Optional<Users> optional = repository.findById(id);
+        if (optional.isEmpty()){
+            throw new BadRequest("User not found");
+        }
+        var user = optional.get();
+        user.setName(users.getName());
+        return repository.save(user);
 
     }
 

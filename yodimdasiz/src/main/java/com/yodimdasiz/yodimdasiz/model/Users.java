@@ -25,16 +25,14 @@ public class Users implements UserDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(unique = true, nullable = false)
+    private String name;
+
     private String username;
 
-    @Column(unique = true, nullable = false)
     private String email;
 
-    @Column(unique = true)
     private String phone;
 
-    @Column(nullable = false)
     private String password;
 
     private String photoUrl;
@@ -45,6 +43,7 @@ public class Users implements UserDetails {
     private LocalDateTime createdAt;
 
     private LocalDateTime updatedAt;
+
 
 
     @PrePersist
@@ -67,6 +66,7 @@ public class Users implements UserDetails {
     public String getUsername() {
         return email;
     }
+
 
     @Override
     public boolean isAccountNonExpired() {

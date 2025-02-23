@@ -10,7 +10,7 @@ import java.util.List;
 @Repository
 public interface MemorialPagesRepository extends JpaRepository<MemorialPages, Integer> {
 
-    MemorialPages findByMaintenanceOrder_Id(Integer id);
+//    MemorialPages findByMaintenanceOrder_Id(Integer id);
 
-    List<MemorialPages> getMemorialPagesByUserId(Integer id);
+//    List<MemorialPages> getMemorialPagesByUserId(Integer id);
 }
