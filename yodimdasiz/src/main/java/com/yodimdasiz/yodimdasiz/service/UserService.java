@@ -103,7 +103,6 @@ public class UserService {
 
         var user = optional.get();
 
-        // Spring Boot resource papkasiga faylni saqlash yo‘li
         String uploadDir = new File("yodimdasiz/src/main/resources/static/uploads/users").getAbsolutePath();
         File folder = new File(uploadDir + File.separator + YMD);
         if (!folder.exists() && !folder.mkdirs()) {
@@ -113,14 +112,13 @@ public class UserService {
         String filePath = folder.getAbsolutePath() + File.separator + token + ".png";
         File imageFile = new File(filePath);
 
-        // Fayl mavjudligini tekshirish
         if (file == null || file.isEmpty()) {
             throw new BadRequest("File is empty");
         }
 
         try {
-            file.transferTo(imageFile); // Faylni saqlash
-            user.setPhotoUrl("/uploads/users/" + YMD + "/" + token + ".png"); // Frontend uchun URL
+                file.transferTo(imageFile);
+            user.setPhotoUrl("/uploads/users/" + YMD + "/" + token + ".png");
             repository.save(user);
             return "File uploaded successfully: " + user.getPhotoUrl();
         } catch (IOException e) {

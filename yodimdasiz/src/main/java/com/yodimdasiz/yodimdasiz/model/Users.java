@@ -64,7 +64,7 @@ public class Users implements UserDetails {
 
     @Override
     public String getUsername() {
-        return email;
+        return email != null ? email :phone;
     }
 
 
