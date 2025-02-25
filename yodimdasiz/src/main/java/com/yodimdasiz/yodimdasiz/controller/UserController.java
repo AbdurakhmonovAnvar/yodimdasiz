@@ -99,7 +99,7 @@ public class UserController {
     }
 
 
-    @PutMapping
+    @PutMapping("/username")
     public ResponseEntity<?> updateName(@RequestHeader("Authorization") String token, @RequestBody Users users){
         String jwtToken = token.substring(7);
         Integer id = jwtUtil.extractUserId(jwtToken);
