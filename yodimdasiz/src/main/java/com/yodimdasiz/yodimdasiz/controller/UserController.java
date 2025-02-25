@@ -20,13 +20,13 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserController {
 
-//    private static final String UPLOAD_USER_DIR = "src/main/resources/static/uploads/";
 
     @Autowired
     private JwtService jwtUtil;
 
     @Autowired
     private UserService service;
+
 
 
 

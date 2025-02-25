@@ -42,6 +42,8 @@ public class Users implements UserDetails {
     private boolean isVerified = false; // Default: false
 
 
+    private String qrCodeUrl;
+
     @Enumerated(EnumType.STRING)
     private Role role;
 

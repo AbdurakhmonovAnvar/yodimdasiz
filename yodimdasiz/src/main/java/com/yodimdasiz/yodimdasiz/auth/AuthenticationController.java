@@ -12,6 +12,7 @@ public class AuthenticationController {
     @Autowired
     private AuthenticationService authService;
 
+
     @PostMapping("/register")
     public ResponseEntity<String> register(@RequestBody RegisterRequest request){
         String verCode = authService.sendVerCode(request.getEmail());

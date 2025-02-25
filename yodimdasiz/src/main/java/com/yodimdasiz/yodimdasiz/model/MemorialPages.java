@@ -3,9 +3,7 @@ package com.yodimdasiz.yodimdasiz.model;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
-import org.w3c.dom.Text;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity

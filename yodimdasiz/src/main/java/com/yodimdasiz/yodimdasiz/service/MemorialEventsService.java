@@ -39,7 +39,10 @@ public class MemorialEventsService {
     }
 
     public void deleteEvent(Integer id) {
-        MemorialEvents event = getEventById(id);
-        memorialEventsRepository.delete(event);
+        if (!memorialEventsRepository.existsById(id)) {
+            throw new RuntimeException("Event not found");
+        }
+        memorialEventsRepository.deleteById(id);
     }
+
 }
