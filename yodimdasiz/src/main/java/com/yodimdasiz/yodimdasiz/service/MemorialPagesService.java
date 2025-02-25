@@ -121,7 +121,7 @@ public class MemorialPagesService {
             memorial.setQrCode("/uploads/qrCode/"+YMD+"/"+token+".png");
             return  repository.save(memorial);
         } catch (WriterException | IOException e) {
-            e.printStackTrace(); // Print the error for debugging
+            e.printStackTrace();
             return null;
         }
 

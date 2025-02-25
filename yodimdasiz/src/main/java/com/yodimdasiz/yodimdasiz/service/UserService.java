@@ -5,6 +5,7 @@ import com.yodimdasiz.yodimdasiz.exception.BadRequest;
 import com.yodimdasiz.yodimdasiz.model.Users;
 import com.yodimdasiz.yodimdasiz.repository.UserRepository;
 import jakarta.transaction.Transactional;
+import org.apache.catalina.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.MediaType;
@@ -168,6 +169,8 @@ public class UserService {
         return repository.save(user);
 
     }
+
+
 
 
 

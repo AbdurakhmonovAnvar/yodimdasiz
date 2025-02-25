@@ -61,8 +61,6 @@ public class UserController {
         return ResponseEntity.ok(updatedPhone);
     }
 
-
-
     @PutMapping("/password")
     public ResponseEntity<?> updatePassword(@RequestHeader("Authorization") String token,@RequestBody Users user){
         String jwtToken = token.substring(7);
@@ -99,7 +97,6 @@ public class UserController {
         Integer id = jwtUtil.extractUserId(jwtToken);
         return service.getUserPhoto(id,token);
     }
-
 
 
     @PutMapping

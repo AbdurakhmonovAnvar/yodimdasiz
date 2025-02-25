@@ -3,10 +3,7 @@ package com.yodimdasiz.yodimdasiz.auth;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -16,8 +13,15 @@ public class AuthenticationController {
     private AuthenticationService authService;
 
     @PostMapping("/register")
-    public ResponseEntity<AuthenticationResponse> register(@RequestBody RegisterRequest request){
-        return ResponseEntity.ok(authService.register(request));
+    public ResponseEntity<String> register(@RequestBody RegisterRequest request){
+        String verCode = authService.sendVerCode(request.getEmail());
+        return ResponseEntity.ok(authService.register(request,verCode));
+    }
+
+    @PostMapping("/verCode")
+    public ResponseEntity<AuthenticationResponse> verificationCode(@RequestParam String code, @RequestParam String email){
+        AuthenticationResponse verCode = authService.verificationCode(code,email);
+        return ResponseEntity.ok().body(verCode);
     }
 
     @PostMapping("/authenticate")
@@ -25,9 +29,5 @@ public class AuthenticationController {
         return ResponseEntity.ok(authService.authenticate(request));
     }
 
-//    @PostMapping("/phone")
-//    public ResponseEntity<AuthenticationResponse> authPhone(@RequestBody AuthenticationRequest request){
-//        return ResponseEntity.ok(authService.authPhone(request));
-//    }
 
 }

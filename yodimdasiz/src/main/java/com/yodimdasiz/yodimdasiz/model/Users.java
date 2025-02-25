@@ -37,6 +37,11 @@ public class Users implements UserDetails {
 
     private String photoUrl;
 
+    private String verifyCode;
+
+    private boolean isVerified = false; // Default: false
+
+
     @Enumerated(EnumType.STRING)
     private Role role;
 
@@ -85,7 +90,7 @@ public class Users implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return isVerified;
     }
     @Override
     public String getPassword(){
